@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Trash2, Edit, Plus } from 'lucide-react';
+import { Edit, Plus } from 'lucide-react';
 
 export default function PaymentModePage() {
     const [paymentModes, setPaymentModes] = useState([]);
@@ -26,7 +26,7 @@ export default function PaymentModePage() {
             try {
                 setIsLoading(true);
                 setError(null);
-                const res = await fetch('/api/paymentmode', { cache: 'no-store' });
+                const res = await fetch('/api/paymentmode');
                 if (!res.ok) throw new Error('Failed to fetch payment modes');
                 const data = await res.json();
                 console.log('Payment modes raw response:', data);
@@ -36,8 +36,8 @@ export default function PaymentModePage() {
                     : (data?.data ?? data?.rows ?? data?.result ?? []);
                 const rawList = Array.isArray(candidate) ? candidate : [];
                 const list = rawList.map((row) => ({
-                    id: row.v_paymentmodeid ?? row.paymentmodeid ?? row.id,
-                    name: row.v_paymentmodename ?? row.paymentmodename ?? row.name ?? '',
+                    id: row.v_paymentmodeid,
+                    name: row.v_paymentmodename,
                     status: (row.v_isactive === true || row.isactive === true)
                         ? 'Active'
                         : (row.v_isactive === false || row.isactive === false)
@@ -73,7 +73,7 @@ export default function PaymentModePage() {
                 ...createdRow,
             };
             setPaymentModes((prev) => [normalized, ...prev]);
-            setFormData({ name: '', description: '', status: 'Active' });
+            setFormData({ name: '', status: 'Active' });
             setIsCreateOpen(false);
         } catch (err) {
             setError(err.message || 'Failed to create');
@@ -109,7 +109,7 @@ export default function PaymentModePage() {
             }));
             setIsEditOpen(false);
             setCurrentItem(null);
-            setFormData({ name: '', description: '', status: 'Active' });
+            setFormData({ name: '', status: 'Active' });
         } catch (err) {
             setError(err.message || 'Failed to update');
         }
@@ -117,12 +117,12 @@ export default function PaymentModePage() {
 
 
     const openEditDialog = (item) => {
-        const paymentModeId = item.paymentmodeid ?? item.v_paymentmodeid ?? item.id;
-        const name = item.name ?? item.paymentmodename ?? item.v_paymentmodename ?? '';
+        const paymentModeId = item.v_paymentmodeid
+        const name = item.v_paymentmodename;
         const status = item.status ?? ((item.isactive === true || item.v_isactive === true) ? 'Active' : 'Inactive');
         
         setCurrentItem({ ...item, paymentmodeid: paymentModeId });
-        setFormData({ name, description: item.description ?? '', status });
+        setFormData({ name, status });
         setIsEditOpen(true);
     };
 
