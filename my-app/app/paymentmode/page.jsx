@@ -30,7 +30,7 @@ export default function PaymentModePage() {
                 if (!res.ok) throw new Error('Failed to fetch payment modes');
                 const data = await res.json();
                 console.log('Payment modes raw response:', data);
-                // Normalize to a consistent shape: id, name, status
+
                 const candidate = Array.isArray(data)
                     ? data
                     : (data?.data ?? data?.rows ?? data?.result ?? []);
@@ -92,7 +92,7 @@ export default function PaymentModePage() {
             });
             if (!res.ok) throw new Error('Failed to update payment mode');
             const updated = await res.json();
-            // Update local list using backend canonical fields
+
             setPaymentModes(paymentModes.map(item => {
                 const itemId = item.paymentmodeid ?? item.id;
                 if (itemId === id) {
@@ -126,10 +126,6 @@ export default function PaymentModePage() {
         setIsEditOpen(true);
     };
 
-    const openDeleteDialog = (item) => {
-        setCurrentItem(item);
-        setIsDeleteOpen(true);
-    };
 
     return (
         <div className="header-space mx-auto max-w-7xl">
@@ -201,7 +197,7 @@ export default function PaymentModePage() {
                             {error}
                         </div>
                     )}
-                    {/* Search & Filters */}
+                    {/* Search & Filters Yessurrrrrrrrrrrrrrrrrrrrrrrrrr*/}
                     <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <div className="sm:col-span-2">
                             <Label htmlFor="search">Search</Label>
@@ -276,7 +272,7 @@ export default function PaymentModePage() {
                                                         <Edit className="h-4 w-4" />
                                                     </Button>   
                                                 </div>
-                                                {/* Debug: show raw item shape to verify fields */}
+                                                {/* For Debugging :> */}
                                                 <pre className="text-xs text-muted-foreground overflow-auto max-h-24 bg-muted/20 p-2 rounded">
                                                     {JSON.stringify(mode, null, 2)}
                                                 </pre>
