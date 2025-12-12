@@ -70,8 +70,13 @@ export default function PaymentModePage() {
     return (
         <div className="header-space mx-auto max-w-7xl">
             <h1 className="text-3xl font-bold mb-6 text-center py-10">Payment Modes Management</h1>
+            <div className="px-4">
+                <Button variant="destructive" className="mb-4" onClick={() => window.history.back()}>
+                    Back
+                </Button>
+            </div>
             
-        <div className="container mx-auto py-8 px-4">
+        <div className="container mx-auto px-4">
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
