@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/page.jsx", "app/layout.jsx", "components/ui/button.jsx", "components/ui/alert.jsx", "components/ui/dialog.jsx", "components/ui/card.jsx", "components/ui/field.jsx", "components/ui/dropdown-menu.jsx", "components/ui/label.jsx", "components/ui/input.jsx", "components/ui/select.jsx", "components/ui/native-select.jsx", "components/ui/sheet.jsx", "components/ui/separator.jsx", "components/ui/skeleton.jsx", "components/ui/sidebar.jsx", "components/ui/table.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/page.jsx", "app/layout.jsx", "components/ui/button.jsx", "components/ui/alert.jsx", "components/ui/dialog.jsx", "components/ui/card.jsx", "components/ui/field.jsx", "components/ui/dropdown-menu.jsx", "components/ui/label.jsx", "components/ui/input.jsx", "components/ui/select.jsx", "components/ui/native-select.jsx", "components/ui/sheet.jsx", "components/ui/separator.jsx", "components/ui/skeleton.jsx", "components/ui/sidebar.jsx", "components/ui/table.jsx", "components/ui/spinner.jsx"],
   "exclude": ["node_modules"]
 }
