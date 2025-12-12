@@ -6,13 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Textarea } from '@/components/ui/textarea';
 import { Spinner } from '@/components/ui/spinner';
 import { Trash2, Edit, Plus } from 'lucide-react';
 
 export default function PaymentModePage() {
     const [paymentModes, setPaymentModes] = useState([]);
+    const [query, setQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
     const [isLoading, setIsLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -21,7 +21,6 @@ export default function PaymentModePage() {
     const [formData, setFormData] = useState({ name: '', description: '', status: 'Active' });
 
     useEffect(() => {
-        // Simulate loading data
         setTimeout(() => {
             setPaymentModes([
                 { id: 1, name: 'Credit Card', description: 'Pay using credit card', status: 'Active' },
@@ -69,6 +68,9 @@ export default function PaymentModePage() {
     };
 
     return (
+        <div className="header-space mx-auto max-w-7xl">
+            <h1 className="text-3xl font-bold mb-6 text-center py-10">Payment Modes Management</h1>
+            
         <div className="container mx-auto py-8 px-4">
             <Card>
                 <CardHeader>
@@ -102,15 +104,6 @@ export default function PaymentModePage() {
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="description">Description</Label>
-                                        <Textarea
-                                            id="description"
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            placeholder="Enter description"
-                                        />
-                                    </div>
-                                    <div className="grid gap-2">
                                         <Label htmlFor="status">Status</Label>
                                         <select
                                             id="status"
@@ -134,64 +127,90 @@ export default function PaymentModePage() {
                     </div>
                 </CardHeader>
                 <CardContent>
+                    {/* Search & Filters */}
+                    <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div className="sm:col-span-2">
+                            <Label htmlFor="search">Search</Label>
+                            <Input
+                                id="search"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                placeholder="Search by name or description"
+                                className="mt-1"
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="filter-status">Status</Label>
+                            <select
+                                id="filter-status"
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            >
+                                <option value="All">All</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
                     {isLoading ? (
                         <div className="flex justify-center items-center py-8">
                             <Spinner className="h-8 w-8" />
                         </div>
                     ) : (
-                        <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>ID</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
+                        <>
                             {paymentModes.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                        No payment modes found. Add one to get started.
-                                    </TableCell>
-                                </TableRow>
+                                <div className="text-center text-muted-foreground py-6">
+                                    No payment modes found. Add one to get started.
+                                </div>
                             ) : (
-                                paymentModes.map((mode) => (
-                                    <TableRow key={mode.id}>
-                                        <TableCell className="font-medium">{mode.id}</TableCell>
-                                        <TableCell>{mode.name}</TableCell>
-                                        <TableCell>{mode.description}</TableCell>
-                                        <TableCell>
-                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                                                mode.status === 'Active' 
-                                                    ? 'bg-green-100 text-green-800' 
-                                                    : 'bg-gray-100 text-gray-800'
-                                            }`}>
-                                                {mode.status}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => openEditDialog(mode)}
-                                            >
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => openDeleteDialog(mode)}
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
+                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    {paymentModes
+                                        .filter((m) => {
+                                            const matchesQuery = (m.name + ' ' + (m.description ?? '')).toLowerCase().includes(query.toLowerCase());
+                                            const matchesStatus = statusFilter === 'All' ? true : m.status === statusFilter;
+                                            return matchesQuery && matchesStatus;
+                                        })
+                                        .map((mode) => (
+                                        <Card key={mode.id}>
+                                            <CardHeader className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <CardTitle className="text-lg">{mode.name}</CardTitle>
+                                                    <span
+                                                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                                                            mode.status === 'Active'
+                                                                ? 'bg-green-100 text-green-800'
+                                                                : 'bg-gray-100 text-gray-800'
+                                                        }`}
+                                                    >
+                                                        {mode.status}
+                                                    </span>
+                                                </div>
+                                                <CardDescription>Mode ID: {mode.id}</CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="space-y-4">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => openEditDialog(mode)}
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => openDeleteDialog(mode)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                        ))}
+                                </div>
                             )}
-                        </TableBody>
-                        </Table>
+                        </>
                     )}
                 </CardContent>
             </Card>
@@ -213,15 +232,6 @@ export default function PaymentModePage() {
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="Enter payment mode name"
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="edit-description">Description</Label>
-                            <Textarea
-                                id="edit-description"
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="Enter description"
                             />
                         </div>
                         <div className="grid gap-2">
@@ -272,6 +282,7 @@ export default function PaymentModePage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+        </div>
         </div>
     );
 }
