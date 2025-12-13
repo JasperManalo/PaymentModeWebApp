@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Gauge, Edit, Plus } from 'lucide-react';
 
 
-function CreateDialog({ isOpen, onOpenChange, formData, setFormData, onCreate, isLoading }) {
+function CreateDialog({ isOpen, onOpenChange, formData, setFormData, onCreate, isLoading, createError, setCreateError }) {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
@@ -29,7 +29,10 @@ function CreateDialog({ isOpen, onOpenChange, formData, setFormData, onCreate, i
                         <Input
                             id="name"
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={(e) => {
+                                setFormData({ ...formData, name: e.target.value });
+                                if (createError) setCreateError(null);
+                            }}
                             placeholder="Enter payment mode name"
                         />
                     </div>
@@ -44,10 +47,16 @@ function CreateDialog({ isOpen, onOpenChange, formData, setFormData, onCreate, i
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>
+                        {createError && (
+                            <Label className="mb-4 text-sm text-destructive">{createError}</Label>
+                        )}
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button variant="outline" onClick={() => {
+                        setCreateError(null);
+                        onOpenChange(false);
+                    }}>
                         Cancel
                     </Button>
                     <Button onClick={onCreate} disabled={isLoading}>
@@ -61,7 +70,7 @@ function CreateDialog({ isOpen, onOpenChange, formData, setFormData, onCreate, i
 }
 
 
-function EditDialog({ isOpen, onOpenChange, formData, setFormData, onEdit, isLoading }) {
+function EditDialog({ isOpen, onOpenChange, formData, setFormData, onEdit, isLoading, updateError, setUpdateError }) {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
@@ -75,10 +84,16 @@ function EditDialog({ isOpen, onOpenChange, formData, setFormData, onEdit, isLoa
                         <Input
                             id="edit-name"
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={(e) => {
+                                setFormData({ ...formData, name: e.target.value });
+                                if (updateError) setUpdateError(null);
+                            }}
                             placeholder="Enter payment mode name"
                         />
                     </div>
+                    {updateError && (
+                        <Label className="mb-4 text-sm text-destructive">{updateError}</Label>
+                    )}
                     <div className="grid gap-2">
                         <Label htmlFor="edit-status">Status</Label>
                         <select
@@ -93,7 +108,10 @@ function EditDialog({ isOpen, onOpenChange, formData, setFormData, onEdit, isLoa
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button variant="outline" onClick={() => {
+                        setUpdateError(null);
+                        onOpenChange(false);
+                    }}>
                         Cancel
                     </Button>
                     <Button onClick={onEdit} disabled={isLoading}>
@@ -183,7 +201,9 @@ export default function PaymentModePage() {
     const [error, setError] = useState(null);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isCreateLoading, setIsCreateLoading] = useState(false);
+    const [createError, setCreateError] = useState(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [updateError, setUpdateError] = useState(null);
     const [currentItem, setCurrentItem] = useState(null);
     const [formData, setFormData] = useState({ name: '', status: 'Active' });
     const [isEditLoading, setIsEditLoading] = useState(false);
@@ -216,20 +236,29 @@ export default function PaymentModePage() {
 
     //Post
     const handleCreate = async () => {
+        if (!formData.name.trim()) {
+            setCreateError('Name is required');
+            return;
+        }
         try {
-            setError(null);
+            setCreateError(null);
             setIsCreateLoading(true);
             const res = await fetch('/api/paymentmode', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: formData.name, status: formData.status }),
             });
-            if (!res.ok) throw new Error('Failed to create payment mode');
+
+            if (!res.ok){
+                const errorData = await res.json().catch(() => ({}));
+                setCreateError(errorData.details || 'Failed to create payment mode');
+                return;
+            }
             await fetchPaymentModes();
             setFormData({ name: '', status: 'Active' });
             setIsCreateOpen(false);
         } catch (err) {
-            setError(err.message || 'Failed to create');
+            setCreateError(err.message || 'Failed to create');
         } finally {
             setIsCreateLoading(false);
         }
@@ -237,8 +266,12 @@ export default function PaymentModePage() {
 
     //Put
     const handleEdit = async () => {
+        if (!formData.name.trim()) {
+            setUpdateError('Name is required');
+            return;
+        }
         try {
-            setError(null);
+            setUpdateError(null);
             setIsEditLoading(true);
             const id = currentItem?.v_paymentmodeid;
             if (!id) throw new Error('Missing payment mode id');
@@ -247,13 +280,17 @@ export default function PaymentModePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ paymentmodename: formData.name, isactive: formData.status === 'Active' }),
             });
-            if (!res.ok) throw new Error('Failed to update payment mode');
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                setUpdateError(errorData.details || 'Failed to update payment mode');
+                return;
+            }
             await fetchPaymentModes();
             setIsEditOpen(false);
             setCurrentItem(null);
             setFormData({ name: '', status: 'Active' });
         } catch (err) {
-            setError(err.message || 'Failed to update');
+            setUpdateError(err.message || 'Failed to update');
         } finally {
             setIsEditLoading(false);
         }
@@ -301,6 +338,8 @@ export default function PaymentModePage() {
                                 setFormData={setFormData}
                                 onCreate={handleCreate}
                                 isLoading={isCreateLoading}
+                                createError={createError}
+                                setCreateError={setCreateError}
                             />
                         </div>
                     </CardHeader>
@@ -345,6 +384,8 @@ export default function PaymentModePage() {
                     setFormData={setFormData}
                     onEdit={handleEdit}
                     isLoading={isEditLoading}
+                    updateError={updateError}
+                    setUpdateError={setUpdateError}
                 />
             </div>
         </div>
