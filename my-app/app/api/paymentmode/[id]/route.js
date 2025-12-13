@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+//http://localhost:3001
+//https://paymentmodeapi-production.up.railway.app
 
 export async function PUT(request, { params }) {
     try {
