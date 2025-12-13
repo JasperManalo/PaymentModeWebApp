@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Gauge } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Home() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function Home() {
         </h1>
 
         {isLoading ? (
-          <div className="text-lg text-gray-600">Loading...</div>
+          <div className="flex justify-center text-lg text-gray-600"><Spinner className="h-8 w-8" /></div>
         ) : (
           <div className="space-y-2">
             <div className="text-lg font-bold">
