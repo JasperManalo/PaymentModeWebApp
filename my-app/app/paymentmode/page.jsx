@@ -64,7 +64,7 @@ export default function PaymentModePage() {
                 ...createdRow,
             };
             await fetchPaymentModes();
-            setFormData({ name: '', description: '', status: 'Active' });
+            setFormData({ name: '', status: 'Active' });
             setIsCreateOpen(false);
         } catch (err) {
             setError(err.message || 'Failed to create');
