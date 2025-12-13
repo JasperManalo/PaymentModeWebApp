@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Edit, Plus } from 'lucide-react';
+import { Gauge, Edit, Plus } from 'lucide-react';
 
 export default function PaymentModePage() {
     const [paymentModes, setPaymentModes] = useState([]);
@@ -19,39 +19,30 @@ export default function PaymentModePage() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState(null);
-    const [formData, setFormData] = useState({ name: '', description: '', status: 'Active' });
+    const [formData, setFormData] = useState({ name: '', status: 'Active' });
+
+    const fetchPaymentModes = async () => {
+        try {
+            setIsLoading(true);
+            const res = await fetch('/api/paymentmode');
+            if (!res.ok) throw new Error('Failed to fetch payment modes');
+            const data = await res.json();
+            const candidate = Array.isArray(data) ? data : (data?.data ?? []);
+            const list = candidate.map((row) => ({
+                id: row.v_paymentmodeid,
+                name: row.v_paymentmodename,
+                status: row.v_isactive === true ? 'Active' : 'Inactive',
+                ...row,
+            }));
+            setPaymentModes(list);
+        } catch (err) {
+            setError(err.message || 'Something went wrong');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchPaymentModes = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
-                const res = await fetch('/api/paymentmode');
-                if (!res.ok) throw new Error('Failed to fetch payment modes');
-                const data = await res.json();
-                console.log('Payment modes raw response:', data);
-
-                const candidate = Array.isArray(data)
-                    ? data
-                    : (data?.data ?? data?.rows ?? data?.result ?? []);
-                const rawList = Array.isArray(candidate) ? candidate : [];
-                const list = rawList.map((row) => ({
-                    id: row.v_paymentmodeid,
-                    name: row.v_paymentmodename,
-                    status: (row.v_isactive === true || row.isactive === true)
-                        ? 'Active'
-                        : (row.v_isactive === false || row.isactive === false)
-                            ? 'Inactive'
-                            : (row.status ?? 'Inactive'),
-                    ...row,
-                }));
-                setPaymentModes(list);
-            } catch (err) {
-                setError(err.message || 'Something went wrong');
-            } finally {
-                setIsLoading(false);
-            }
-        };
         fetchPaymentModes();
     }, []);
 
@@ -67,13 +58,13 @@ export default function PaymentModePage() {
             const created = await res.json();
             const createdRow = created?.data ?? created;
             const normalized = {
-                id: createdRow?.paymentmodeid ?? createdRow?.id,
-                name: createdRow?.paymentmodename ?? createdRow?.name ?? formData.name,
-                status: (createdRow?.isactive === true || formData.status === 'Active') ? 'Active' : 'Inactive',
+                id: createdRow?.v_paymentmodeid,
+                name: createdRow?.v_paymentmodename,
+                status: createdRow?.v_isactive === true ? 'Active' : 'Inactive',
                 ...createdRow,
             };
-            setPaymentModes((prev) => [normalized, ...prev]);
-            setFormData({ name: '', status: 'Active' });
+            await fetchPaymentModes();
+            setFormData({ name: '', description: '', status: 'Active' });
             setIsCreateOpen(false);
         } catch (err) {
             setError(err.message || 'Failed to create');
@@ -83,7 +74,7 @@ export default function PaymentModePage() {
     const handleEdit = async () => {
         try {
             setError(null);
-            const id = currentItem?.paymentmodeid ?? currentItem?.id;
+            const id = currentItem?.v_paymentmodeid;
             if (!id) throw new Error('Missing payment mode id');
             const res = await fetch(`/api/paymentmode/${id}`, {
                 method: 'PUT',
@@ -93,20 +84,7 @@ export default function PaymentModePage() {
             if (!res.ok) throw new Error('Failed to update payment mode');
             const updated = await res.json();
 
-            setPaymentModes(paymentModes.map(item => {
-                const itemId = item.paymentmodeid ?? item.id;
-                if (itemId === id) {
-                    return {
-                        ...item,
-                        paymentmodeid: id,
-                        paymentmodename: formData.name,
-                        isactive: formData.status === 'Active',
-                        name: formData.name,
-                        status: formData.status,
-                    };
-                }
-                return item;
-            }));
+            await fetchPaymentModes();
             setIsEditOpen(false);
             setCurrentItem(null);
             setFormData({ name: '', status: 'Active' });
@@ -117,22 +95,21 @@ export default function PaymentModePage() {
 
 
     const openEditDialog = (item) => {
-        const paymentModeId = item.v_paymentmodeid
+        const paymentModeId = item.v_paymentmodeid;
         const name = item.v_paymentmodename;
-        const status = item.status ?? ((item.isactive === true || item.v_isactive === true) ? 'Active' : 'Inactive');
+        const status = (item.v_isactive === true) ? 'Active' : 'Inactive';
         
         setCurrentItem({ ...item, paymentmodeid: paymentModeId });
         setFormData({ name, status });
         setIsEditOpen(true);
     };
 
-
     return (
         <div className="header-space mx-auto max-w-7xl">
-            <h1 className="text-3xl font-bold mb-6 text-center py-10">Payment Modes Management</h1>
             <div className="px-4">
-                <Button variant="destructive" className="mb-4" onClick={() => window.history.back()}>
-                    Back
+                <Button className="mb-4 my-4" onClick={() => window.history.back()}>
+                    <Gauge className="mr-2 h-4 w-4" />
+                    Back to Dashboard
                 </Button>
             </div>
             
@@ -185,7 +162,8 @@ export default function PaymentModePage() {
                                     <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                                         Cancel
                                     </Button>
-                                    <Button onClick={handleCreate}>Create</Button>
+                                    <Button onClick={handleCreate}>
+                                        Create</Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
@@ -205,7 +183,7 @@ export default function PaymentModePage() {
                                 id="search"
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                placeholder="Search by name or description"
+                                placeholder="Search by name..."
                                 className="mt-1"
                             />
                         </div>
@@ -237,19 +215,19 @@ export default function PaymentModePage() {
                                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                     {paymentModes
                                         .filter((m) => {
-                                            const name = m.name ?? m.v_paymentmodename ?? m.paymentmodename ?? '';
-                                            const matchesQuery = (name + ' ' + (m.description ?? '')).toLowerCase().includes(query.toLowerCase());
-                                            const status = m.status ?? ((m.v_isactive === true || m.isactive === true) ? 'Active' : 'Inactive');
+                                            const name = m.v_paymentmodename;
+                                            const matchesQuery = (name + ' ').toLowerCase().includes(query.toLowerCase());
+                                            const status = m.status ?? ((m.v_isactive === true) ? 'Active' : 'Inactive');
                                             const matchesStatus = statusFilter === 'All' ? true : status === statusFilter;
                                             return matchesQuery && matchesStatus;
                                         })
-                                        .map((mode, index) => {
-                                            const key = mode.id ?? mode.paymentmodeid ?? `${mode.name}-${index}`;
+                                        .map((mode) => {
+                                            const key = mode.id ?? mode.paymentmodeid;
                                             return (
                                         <Card key={key}>
                                             <CardHeader className="space-y-2">
                                                 <div className="flex items-center justify-between">
-                                                    <CardTitle className="text-lg">{mode.name ?? mode.v_paymentmodename ?? mode.paymentmodename}</CardTitle>
+                                                    <CardTitle className="text-lg">{mode.v_paymentmodename}</CardTitle>
                                                     <span
                                                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                                                             (mode.status === 'Active' || (mode.status !== 'Inactive' && (mode.v_isactive === true || mode.isactive === true)))
@@ -260,11 +238,12 @@ export default function PaymentModePage() {
                                                         {mode.status ?? ((mode.v_isactive === true || mode.isactive === true) ? 'Active' : 'Inactive')}
                                                     </span>
                                                 </div>
-                                                <CardDescription>Mode ID: {mode.id ?? mode.v_paymentmodeid ?? mode.paymentmodeid}</CardDescription>
+                                                <CardDescription>Mode ID: {mode.v_paymentmodeid}</CardDescription>
                                             </CardHeader>
                                             <CardContent className="space-y-4">
                                                 <div className="flex justify-end gap-2">
                                                     <Button
+                                                    
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => openEditDialog(mode)}
@@ -323,7 +302,8 @@ export default function PaymentModePage() {
                         <Button variant="outline" onClick={() => setIsEditOpen(false)}>
                             Cancel
                         </Button>
-                        <Button onClick={handleEdit}>Save Changes</Button>
+                        <Button onClick={handleEdit}>
+                            Save Changes</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
