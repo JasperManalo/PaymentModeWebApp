@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Button } from "../components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Gauge, CreditCard } from "lucide-react";
+import { Gauge } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Home() {
