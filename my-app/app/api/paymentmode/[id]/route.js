@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+//http://localhost:3001
+//https://paymentmodeapi-production.up.railway.app
 
 export async function PUT(request, { params }) {
     try {
@@ -10,7 +12,7 @@ export async function PUT(request, { params }) {
             isactive: typeof body.isactive === 'boolean' ? body.isactive : body.status === 'Active'
         };
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://paymentmodeapi-production.up.railway.app';
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const response = await fetch(`${baseUrl}/paymentmodes/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },

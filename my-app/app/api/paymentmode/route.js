@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-
+//http://localhost:3001
+//https://paymentmodeapi-production.up.railway.app
 
 export async function GET() {
 	try {
-		const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://paymentmodeapi-production.up.railway.app';
+		const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 		const response = await fetch(`${baseUrl}/paymentmodes?paymentmodeid=All`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' },
@@ -20,7 +21,7 @@ export async function GET() {
 export async function POST(request) {
 	try {
 		const body = await request.json();
-		const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://paymentmodeapi-production.up.railway.app';
+		const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 		const payload = {
 			paymentmodename: body.paymentmodename ?? body.name,
 			isactive: typeof body.isactive === 'boolean' ? body.isactive : (body.status === 'Active' || body.status === true),
