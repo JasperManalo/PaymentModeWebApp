@@ -227,7 +227,7 @@ export default function PaymentModePage() {
                                         <Card key={key}>
                                             <CardHeader className="space-y-2">
                                                 <div className="flex items-center justify-between">
-                                                    <CardTitle className="text-lg">{mode.v_paymentmodename}</CardTitle>
+                                                    <CardTitle className="text-lg truncate pr-2 max-w-[200px]">{mode.v_paymentmodename}</CardTitle>
                                                     <span
                                                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                                                             (mode.status === 'Active' || (mode.status !== 'Inactive' && (mode.v_isactive === true || mode.isactive === true)))
@@ -252,7 +252,7 @@ export default function PaymentModePage() {
                                                     </Button>   
                                                 </div>
                                                 {/* For Debugging :> */}
-                                                <pre className="text-xs text-muted-foreground overflow-auto max-h-24 bg-muted/20 p-2 rounded">
+                                                <pre className="text-xs text-muted-foreground overflow-auto max-h-24 bg-muted/20 p-2 rounded break-all whitespace-pre-wrap">
                                                     {JSON.stringify(mode, null, 2)}
                                                 </pre>
                                             </CardContent>
