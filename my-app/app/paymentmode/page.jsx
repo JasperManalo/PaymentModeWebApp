@@ -91,9 +91,7 @@ function EditDialog({ isOpen, onOpenChange, formData, setFormData, onEdit, isLoa
                             placeholder="Enter payment mode name"
                         />
                     </div>
-                    {updateError && (
-                        <Label className="mb-4 text-sm text-destructive">{updateError}</Label>
-                    )}
+
                     <div className="grid gap-2">
                         <Label htmlFor="edit-status">Status</Label>
                         <select
@@ -105,6 +103,9 @@ function EditDialog({ isOpen, onOpenChange, formData, setFormData, onEdit, isLoa
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>
+                    {updateError && (
+                        <Label className="mb-4 text-sm text-destructive">{updateError}</Label>
+                    )}
                     </div>
                 </div>
                 <DialogFooter>
