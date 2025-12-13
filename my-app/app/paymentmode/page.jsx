@@ -60,6 +60,7 @@ function CreateDialog({ isOpen, onOpenChange, formData, setFormData, onCreate, i
     );
 }
 
+
 function EditDialog({ isOpen, onOpenChange, formData, setFormData, onEdit, isLoading }) {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -105,6 +106,7 @@ function EditDialog({ isOpen, onOpenChange, formData, setFormData, onEdit, isLoa
     );
 }
 
+
 function Filters({ query, statusFilter, setQuery, setStatusFilter }) {
     return (
         <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -134,6 +136,7 @@ function Filters({ query, statusFilter, setQuery, setStatusFilter }) {
         </div>
     );
 }
+
 
 function PaymentModeCard({ mode, openEditDialog }) {
     const key = mode.id ?? mode.paymentmodeid;
@@ -171,7 +174,7 @@ function PaymentModeCard({ mode, openEditDialog }) {
     );
 }
 
-// --- Main Page Component ---
+
 export default function PaymentModePage() {
     const [paymentModes, setPaymentModes] = useState([]);
     const [query, setQuery] = useState('');
@@ -185,7 +188,7 @@ export default function PaymentModePage() {
     const [formData, setFormData] = useState({ name: '', status: 'Active' });
     const [isEditLoading, setIsEditLoading] = useState(false);
 
-    // Fetch payment modes
+    //Get
     const fetchPaymentModes = async () => {
         try {
             setIsLoading(true);
@@ -211,7 +214,7 @@ export default function PaymentModePage() {
         fetchPaymentModes();
     }, []);
 
-    // Create handler
+    //Post
     const handleCreate = async () => {
         try {
             setError(null);
@@ -232,7 +235,7 @@ export default function PaymentModePage() {
         }
     };
 
-    // Edit handler
+    //Put
     const handleEdit = async () => {
         try {
             setError(null);
@@ -255,8 +258,7 @@ export default function PaymentModePage() {
             setIsEditLoading(false);
         }
     };
-
-    // Open edit dialog
+    //Dialog
     const openEditDialog = (item) => {
         const paymentModeId = item.v_paymentmodeid;
         const name = item.v_paymentmodename;
@@ -266,7 +268,7 @@ export default function PaymentModePage() {
         setIsEditOpen(true);
     };
 
-    // Filtered payment modes
+    //Filter
     const filteredModes = paymentModes.filter((m) => {
         const name = m.v_paymentmodename;
         const matchesQuery = (name + ' ').toLowerCase().includes(query.toLowerCase());
