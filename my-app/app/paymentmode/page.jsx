@@ -36,21 +36,9 @@ function CreateDialog({ isOpen, onOpenChange, formData, setFormData, onCreate, i
                             placeholder="Enter payment mode name"
                         />
                     </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="status">Status</Label>
-                        <select
-                            id="status"
-                            value={formData.status}
-                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                        >
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                        {createError && (
-                            <Label className="mb-4 text-sm text-destructive">{createError}</Label>
-                        )}
-                    </div>
+                    {createError && (
+                        <Label className="mb-4 text-sm text-destructive">{createError}</Label>
+                    )}
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => {
