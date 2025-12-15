@@ -1,4 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+    
+# Payment Mode Web App
+
+Manage and administer payment modes efficiently with a modern Next.js 15, React 19, and Tailwind CSS 4 web application.
+
+## Features
+- CRUD operations for payment modes (create, read, update)
+- Modern UI with Radix UI, Lucide icons, and custom components
+- API integration (configurable via `.env`)
+- Responsive and accessible design
+
+## Project Structure
+
+- `app/` — Next.js app directory (pages, API routes)
+- `components/ui/` — Reusable UI components (Button, Card, Dialog, etc.)
+- `components/paymentmode/` — (Reserved for payment mode-specific components)
+- `hooks/` — Custom React hooks
+- `lib/` — Utility functions
+- `public/` — Static assets
+
+## Getting Started
+
+### 1. Install dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file in the project root (already present):
+
+```
+NEXT_PUBLIC_API_URL=https://paymentmodeapi-production.up.railway.app
+```
+
+You can change the API URL as needed.
+
+### 3. Run the development server
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+## Linting
+
+```bash
+npm run lint
+```
+
+## Tech Stack
+- [Next.js 15](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [Tailwind CSS 4](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Lucide React](https://lucide.dev/)
+
+## Folder Overview
+
+- `app/` — Main app, API routes
+- `components/ui/` — UI primitives
+- `hooks/` — Custom hooks
+- `lib/` — Utilities
+
+## Environment Variables
+
+- `NEXT_PUBLIC_API_URL` — Backend API endpoint
+
+## License
+
+MIT
 
 ## Getting Started
 
